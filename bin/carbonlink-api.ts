@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CarbonlinkApiStack } from '../lib/carbonlink-api-stack';
+import { ApiPipelineStack } from '../lib/api-pipeline-stack';
 
 const app = new cdk.App();
-new CarbonlinkApiStack(app, 'EvansTestApiStack', {
+new ApiPipelineStack(app, 'EvansTestApiStack', {
   env: { account: '417916115807', region: 'us-east-1' },
 });
 
