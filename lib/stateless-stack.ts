@@ -6,11 +6,10 @@ import * as path from 'path';
 export class ApiStatelessStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
         super(scope, id, props);
-        
-        const lambdaPath = path.join(__dirname, 'lambda/test-lambda');
+        const lambdaPath = path.join(__dirname, 'lambda');
         new Function(this, 'TestLambda', {
             runtime: Runtime.NODEJS_16_X,
-            handler: "handler",
+            handler: "test-lambda.handler",
             code: Code.fromAsset(lambdaPath),
             environment: { 'STAGE': stageName }
         })
