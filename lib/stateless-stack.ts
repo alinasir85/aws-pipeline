@@ -1,5 +1,5 @@
 import { Stack, StackProps } from "aws-cdk-lib";
-import { IdentitySource, LambdaIntegration, RequestAuthorizer, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { ApiKeySourceType, IdentitySource, LambdaIntegration, RequestAuthorizer, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
@@ -20,8 +20,9 @@ export class ApiStatelessStack extends Stack {
             restApiName: "Carbonlink Test API",
             description: "Test API for Carbonlink",
             deployOptions: {
-                stageName: stageName,
+                stageName: stageName
             },
+            apiKeySourceType: ApiKeySourceType.AUTHORIZER
         });
         
         // Generate a Request-based Lambda Authorizer
@@ -33,7 +34,7 @@ export class ApiStatelessStack extends Stack {
 
         const authorizer = new RequestAuthorizer(this, "ApiAuthorizer", {
             handler: authorizerFn,
-            identitySources: [IdentitySource.header("Authorization")],
+            identitySources: [IdentitySource.context("apiKey")],
         });
 
         /**
