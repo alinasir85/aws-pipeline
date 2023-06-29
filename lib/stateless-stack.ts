@@ -37,12 +37,8 @@ export class ApiStatelessStack extends Stack {
             runtime: NODE18,
             handler: "handler",
             entry: path.join(__dirname, "lambda/Authorizer.ts"),
-            bundling: {
-                minify: true,
-            },
-            environment: {
-                TABLE_NAME: table.tableName
-            }
+            bundling: { minify: true },
+            environment: { TABLE_NAME: table.tableName }
         });
 
         const authorizer = new RequestAuthorizer(this, "ApiRequestAuthorizer", {
@@ -58,11 +54,9 @@ export class ApiStatelessStack extends Stack {
             runtime: NODE18,
             handler: "handler",
             entry: path.join(__dirname, "lambda/TestLambda.ts"),
-            bundling: {
-                minify: true,
-            },
+            bundling: { minify: true },
         });
-        api.root.addMethod("GET", new LambdaIntegration(testLambda), {authorizer});
+        api.root.addMethod("GET", new LambdaIntegration(testLambda), {authorizer, apiKeyRequired: true});
 
         table.grantReadData(authorizerFn);
     }
