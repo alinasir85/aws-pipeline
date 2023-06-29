@@ -1,3 +1,5 @@
+import { APIGatewayRequestAuthorizerEvent } from "aws-lambda";
+
 interface AuthorizerFnResponse {
     principalId: string;
     policyDocument: {
@@ -15,16 +17,12 @@ interface AuthorizerFnResponse {
 
 const effects = ["Deny", "Allow"];
 
-export async function handler(event: {[key: string]: string | number}, context: {[key: string]: string | number}): Promise<AuthorizerFnResponse> {
-    const token = event.authorizationToken;
-
+export async function handler(event: APIGatewayRequestAuthorizerEvent) {
     console.log("----- AUTHORIZER EVENT -----");
     console.log(event, null, 2);
-    console.log("----- AUTHORIZER CONTEXT -----");
-    console.log(context, null, 2);
 
-
-    return generatePolicy("test", effects[+(token == "allow")], event.methodArn as string);
+    const apiKey = event.requestContext.identity.apiKey;
+    return generatePolicy("test", effects[+(apiKey == "let me in")], event.methodArn as string);
 }
 
 const generatePolicy = (principalId: string, effect: string, resource: string): AuthorizerFnResponse => {

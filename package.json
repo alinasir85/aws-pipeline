@@ -11,6 +11,7 @@
     "cdk": "cdk"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
     "@types/jest": "^29.5.1",
     "@types/node": "20.1.7",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.83.1",
+    "aws-lambda": "^1.0.7",
     "constructs": "^10.0.0",
     "path": "^0.12.7",
     "source-map-support": "^0.5.21"
