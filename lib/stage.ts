@@ -7,7 +7,7 @@ export class ApiPipelineStage extends Stage {
     constructor(scope: Construct, stageName: string, props?: StageProps) {
         super(scope, stageName, props);
 
-        new ApiStatelessStack(this, "StatelessStack", stageName);
-        new ApiStatefulStack(this, "StatefulStack", stageName);
+        const stateful = new ApiStatefulStack(this, "StatefulStack", stageName);
+        const stateless = new ApiStatelessStack(this, "StatelessStack", stageName);
     }
 }

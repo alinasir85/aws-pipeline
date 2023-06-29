@@ -1,5 +1,5 @@
 import { Stack, StackProps }from "aws-cdk-lib";
-import { ShellStep, CodePipeline, CodePipelineSource } from "aws-cdk-lib/pipelines";
+import { ShellStep, CodePipeline, CodePipelineSource, ManualApprovalStep } from "aws-cdk-lib/pipelines";
 import { Construct } from "constructs";
 import { ApiPipelineStage } from "./stage";
 
@@ -22,12 +22,14 @@ export class ApiPipelineStack extends Stack {
             env: { account: "417916115807", region: "us-east-1" }
         }));
 
-        // Create Manager Approval step
-
+        
         // Designate Production Stage
-        // const production = pipeline.addStage(new ApiPipelineStage(this, 'production', {
-        //   env: { account: '417916115807', region: 'us-east-1' }
-        // }))
+        // and create Manager Approval step
+        const production = pipeline.addStage(new ApiPipelineStage(this, "production", {
+            env: { account: "417916115807", region: "us-east-1" }
+        }), {
+            pre: [ new ManualApprovalStep("PromoteToProduction")]
+        });
 
     }
 }
