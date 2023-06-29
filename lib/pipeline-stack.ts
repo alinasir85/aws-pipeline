@@ -7,7 +7,7 @@ export class ApiPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const pipeline = new CodePipeline(this, 'Pipeline', {
+    const pipeline = new CodePipeline(this, id, {
       pipelineName: 'ApiPipeline',
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.connection('evangabe/carbonlink-api', 'master', {
@@ -25,9 +25,9 @@ export class ApiPipelineStack extends Stack {
     // Create Manager Approval step
 
     // Designate Production Stage
-    const production = pipeline.addStage(new ApiPipelineStage(this, 'production', {
-      env: { account: '417916115807', region: 'us-east-1' }
-    }))
+    // const production = pipeline.addStage(new ApiPipelineStage(this, 'production', {
+    //   env: { account: '417916115807', region: 'us-east-1' }
+    // }))
 
   }
 }
