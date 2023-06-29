@@ -8,6 +8,6 @@ export class ApiPipelineStage extends Stage {
         super(scope, stageName, props);
 
         const stateful = new ApiStatefulStack(this, "StatefulStack", stageName);
-        const stateless = new ApiStatelessStack(this, "StatelessStack", stageName);
+        const stateless = new ApiStatelessStack(this, "StatelessStack", {stageName, table: stateful.coreTable});
     }
 }

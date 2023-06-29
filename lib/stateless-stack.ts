@@ -1,15 +1,23 @@
 import { Stack, StackProps } from "aws-cdk-lib";
-import { ApiKeySourceType, IdentitySource, LambdaIntegration, RequestAuthorizer, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { IdentitySource, LambdaIntegration, MethodLoggingLevel, RequestAuthorizer, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from "path";
 
-const NODE16 = Runtime.NODEJS_16_X;
+const NODE18 = Runtime.NODEJS_18_X;
+
+interface StatelessStackProps extends StackProps{
+    table: Table;
+    stageName: string;
+}
 
 export class ApiStatelessStack extends Stack {
-    constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
+    constructor(scope: Construct, id: string, props: StatelessStackProps) {
         super(scope, id, props);
+
+        const { table, stageName } = props;
 
         /**
          * * API GATEWAY + AUTHORIZATION
@@ -19,22 +27,27 @@ export class ApiStatelessStack extends Stack {
         const api = new RestApi(this, "CarbonlinkTestApi", {
             restApiName: "Carbonlink Test API",
             description: "Test API for Carbonlink",
-            deployOptions: {
-                stageName: stageName
-            },
-            apiKeySourceType: ApiKeySourceType.AUTHORIZER
+            deployOptions: { stageName, loggingLevel: MethodLoggingLevel.INFO },
+            cloudWatchRole: true
         });
         
         // Generate a Request-based Lambda Authorizer
         const authorizerFn = new NodejsFunction(this, "AuthorizerFunction", {
-            runtime: NODE16,
+            memorySize: 1024,
+            runtime: NODE18,
             handler: "handler",
-            entry: path.join(__dirname, "lambda/AuthorizerFunction.ts"),
+            entry: path.join(__dirname, "lambda/Authorizer.ts"),
+            bundling: {
+                minify: true,
+            },
+            environment: {
+                TABLE_NAME: table.tableName
+            }
         });
 
-        const authorizer = new RequestAuthorizer(this, "ApiAuthorizer", {
+        const authorizer = new RequestAuthorizer(this, "ApiRequestAuthorizer", {
             handler: authorizerFn,
-            identitySources: [IdentitySource.context("apiKey")],
+            identitySources: [IdentitySource.header("Authorization")],
         });
 
         /**
@@ -42,16 +55,15 @@ export class ApiStatelessStack extends Stack {
          */
         const testLambda = new NodejsFunction(this, "TestLambda", {
             memorySize: 1024,
-            runtime: NODE16,
+            runtime: NODE18,
             handler: "handler",
             entry: path.join(__dirname, "lambda/TestLambda.ts"),
             bundling: {
                 minify: true,
-                externalModules: ["aws-sdk"],
             },
-            environment: { "STAGE": stageName }
         });
         api.root.addMethod("GET", new LambdaIntegration(testLambda), {authorizer});
 
+        table.grantReadData(authorizerFn);
     }
 }
