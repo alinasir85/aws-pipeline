@@ -11,8 +11,8 @@ export class ApiStatelessStack extends Stack {
         new NodejsFunction(this, 'TestLambda', {
             memorySize: 1024,
             runtime: Runtime.NODEJS_16_X,
-            handler: "index.handler",
-            entry: path.join(__dirname, 'lambda/TestLambda'),
+            handler: "handler",
+            entry: path.join(__dirname, 'lambda/TestLambda.ts'),
             bundling: {
                 minify: true,
                 externalModules: ['aws-sdk'],
