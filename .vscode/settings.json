@@ -1,3 +1,6 @@
 {
-    "importCost.timeout": 4000
+    "importCost.timeout": 4000,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
 }
