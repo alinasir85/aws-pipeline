@@ -7,7 +7,7 @@ export class ApiStatelessStack extends Stack {
     constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
         super(scope, id, props);
         
-        const lambdaPath = path.join(__dirname, 'lambdas/test-lambda');
+        const lambdaPath = path.join(__dirname, 'lambda/test-lambda');
         new Function(this, 'TestLambda', {
             runtime: Runtime.NODEJS_16_X,
             handler: "handler",
