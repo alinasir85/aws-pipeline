@@ -25,7 +25,7 @@ export class ApiPipelineStack extends Stack {
         
         // Designate Production Stage
         // and create Manager Approval step
-        const production = pipeline.addStage(new ApiPipelineStage(this, "production", {
+        pipeline.addStage(new ApiPipelineStage(this, "production", {
             env: { account: "417916115807", region: "us-east-1" }
         }), {
             pre: [ new ManualApprovalStep("PromoteToProduction")]
