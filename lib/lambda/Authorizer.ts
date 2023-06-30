@@ -12,14 +12,16 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent) {
     if (!authHeader) return generatePolicy("test", "Deny", event.methodArn);
 
     // Query database for user
+    const apikey = authHeader.split("Basic ")[1];
     const user = await dbDoc.query({
         TableName: process.env.TABLE_NAME,
         IndexName: "GSI-1",
         KeyConditionExpression: "SK = :sk",
-        ExpressionAttributeValues: {
-            ":sk": authHeader.split("Basic ")[1]
-        }
+        ExpressionAttributeValues: { ":sk": apikey }
     });
+    console.log("----- AUTHORIZER QUERY -----");
+    console.log("User: ", user, null, 2);
+
     if (!user.Items || !user.Count) {
         console.log("Unauthorized, user does not exist in database.");
         return generatePolicy("test", "Deny", event.methodArn);
@@ -27,11 +29,10 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent) {
         console.log("Unauthorized, user exists in database but is not unique.");
         return generatePolicy("test", "Deny", event.methodArn);
     }
-    console.log("----- AUTHORIZER QUERY -----");
-    console.log("User: ", user.Items, null, 2);
+
     
     const context = user.Items[0];
-    const principalId = "user|" + context.PK;
+    const principalId = context.PK;
     console.log("----- AUTHORIZER RESPONSE -----");
     console.log("Context: ", context, null, 2);
     console.log("Principal ID: ", principalId, null, 2);
