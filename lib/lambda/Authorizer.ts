@@ -11,17 +11,19 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent) {
     const authHeader = event.headers?.["Authorization"];
     if (!authHeader) return generatePolicy("test", "Deny", event.methodArn);
 
+    // Validate and format apikey
+    const authkey = authHeader.split("basic|")[1];
+    const apikey = "apikey#" + authkey;
+
     // Query database for user
-    const apikey = authHeader.split("Basic ")[1];
     const user = await dbDoc.query({
         TableName: process.env.TABLE_NAME,
         IndexName: "GSI-1",
         KeyConditionExpression: "SK = :sk",
         ExpressionAttributeValues: { ":sk": apikey }
     });
-    console.log("----- AUTHORIZER QUERY -----");
-    console.log("User: ", user, null, 2);
 
+    // Validate user is exists and is unique in database 
     if (!user.Items || !user.Count) {
         console.log("Unauthorized, user does not exist in database.");
         return generatePolicy("test", "Deny", event.methodArn);
@@ -30,16 +32,14 @@ export async function handler(event: APIGatewayRequestAuthorizerEvent) {
         return generatePolicy("test", "Deny", event.methodArn);
     }
 
-    
+    // Extract identity context
     const context = user.Items[0];
     const principalId = context.PK;
-    console.log("----- AUTHORIZER RESPONSE -----");
-    console.log("Context: ", context, null, 2);
-    console.log("Principal ID: ", principalId, null, 2);
 
     return generatePolicy(principalId, "Allow", event.methodArn, context);
 }
 
+// Helper to generate policy based on effect and context, resource is wildcard for now
 const generatePolicy = (principalId: string, effect: string, resource: string, context?: APIGatewayAuthorizerResultContext): APIGatewayAuthorizerResult => {
     return {
         principalId,
