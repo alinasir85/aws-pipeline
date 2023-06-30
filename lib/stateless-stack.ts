@@ -4,6 +4,7 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { NodeLambda } from "./constructs/stateless/NodeLambda";
+import * as path from "path";
 
 const NODE18 = Runtime.NODEJS_18_X;
 
@@ -32,7 +33,7 @@ export class ApiStatelessStack extends Stack {
         
         // Generate a Request-based Lambda Authorizer
         const authorizerFn = new NodeLambda(this, "AuthorizerLambda", {
-            path: "/lambda/Authorizer.ts",
+            entry: path.join(__dirname, "lambda/Authorizer.ts"),
             environment: { TABLE_NAME: table.tableName }
         });
         const authorizer = new RequestAuthorizer(this, "ApiRequestAuthorizer", {
@@ -43,7 +44,7 @@ export class ApiStatelessStack extends Stack {
         /**
          * * LAMBDA INTEGRATIONS
          */
-        const testLambda = new NodeLambda(this, "TestLambda", { path: "lambda/TestLambda.ts" });
+        const testLambda = new NodeLambda(this, "TestLambda", { entry: path.join(__dirname, "lambda/Test.ts") });
         api.root.addMethod("GET", new LambdaIntegration(testLambda), {authorizer, apiKeyRequired: true});
 
         /**

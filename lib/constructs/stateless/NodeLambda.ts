@@ -6,7 +6,7 @@ import { Construct } from "constructs";
 import * as path from "path";
 
 interface NodeLambdaProps {
-    path: string;
+    entry: string;
     environment?: { [key: string]: string };
     externalModules?: string[];
 }
@@ -17,7 +17,7 @@ export class NodeLambda extends NodejsFunction {
             memorySize: 1024,
             runtime: Runtime.NODEJS_18_X,
             handler: "handler",
-            entry: path.join(__dirname, props.path),
+            entry: props.entry,
             bundling: { minify: true, externalModules: props.externalModules ?? [] },
             environment: props.environment
         });
