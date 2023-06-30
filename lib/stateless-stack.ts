@@ -44,7 +44,7 @@ export class ApiStatelessStack extends Stack {
         /**
          * * LAMBDA INTEGRATIONS
          */
-        const testLambda = new NodeLambda(this, "TestLambda", { entry: path.join(__dirname, "lambda/Test.ts") });
+        const testLambda = new NodeLambda(this, "TestLambda", { entry: path.join(__dirname, "lambda/TestLambda.ts") });
         api.root.addMethod("GET", new LambdaIntegration(testLambda), {authorizer, apiKeyRequired: true});
 
         /**
