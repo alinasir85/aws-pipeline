@@ -13,10 +13,10 @@ export class ApiStatefulStack extends Stack {
     this.coreTable = new OneTable(this, "CoreTable").table;
 
     // Seeding Core Table
-    new SeedResource(this, "SeedResource", {
-      tableName: this.coreTable.tableName,
-      tableArn: this.coreTable.tableArn,
-    });
+    // new SeedResource(this, "SeedResource", {
+    //   tableName: this.coreTable.tableName,
+    //   tableArn: this.coreTable.tableArn,
+    // });
   }
   
 }
