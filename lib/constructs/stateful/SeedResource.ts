@@ -22,6 +22,7 @@ type Category =
 
 type DBString<T> = { S: T };
 type DBNumber = { N: number };
+type DBNumberList = { L: number[]}
 
 interface BaseAsset {
   PK: DBString<string>;
@@ -55,7 +56,7 @@ interface Project extends BaseAsset {
   longitude: DBNumber;
   hectares: DBNumber;
   methodology: DBString<string>;
-  sdgs: DBNumber[];
+  sdgs: DBNumberList;
 }
 type Asset = Project | Pool | Vintage;
 
@@ -83,26 +84,18 @@ export class SeedResource extends AwsCustomResource {
             initialVintages
           ),
         },
-        physicalResourceId: PhysicalResourceId.of(props.tableName + "insert"),
+        physicalResourceId: PhysicalResourceId.of(Date.now().toString()),
       },
       logRetention: RetentionDays.ONE_WEEK,
-      policy: AwsCustomResourcePolicy.fromStatements([
-        new PolicyStatement({
-          sid: "DynamoWriteAccess",
-          effect: Effect.ALLOW,
-          actions: ["dynamodb:BatchWriteItem"],
-          resources: [props.tableArn],
-        }),
-      ]),
+      policy: AwsCustomResourcePolicy.fromSdkCalls({
+        resources: [props.tableArn]
+      }),
     });
   }
 }
-const getAssets = (pools: Pool[], projects: Project[], vintages: Vintage[]) => {
-  const itemsAsPutRequest: AssetPutRequest[] = [];
-  const allAssets = [...pools, ...projects, ...vintages];
-  allAssets.forEach((a) => itemsAsPutRequest.push({ PutRequest: { Item: a } }));
-  return itemsAsPutRequest;
-};
+const getAssets = (pools: Pool[], projects: Project[], vintages: Vintage[]): AssetPutRequest[] => (
+  [...pools, ...projects, ...vintages].map((a) => ({ PutRequest: { Item: a } }))
+);
 
 const initialPools: Pool[] = [
   {
@@ -176,21 +169,7 @@ const initialProjects: Project[] = [
     longitude: { N: 38.805574 },
     hectares: { N: 169741 },
     methodology: { S: "VM0009" },
-    sdgs: [
-      { N: 1 },
-      { N: 2 },
-      { N: 3 },
-      { N: 4 },
-      { N: 5 },
-      { N: 6 },
-      { N: 8 },
-      { N: 10 },
-      { N: 12 },
-      { N: 13 },
-      { N: 15 },
-      { N: 16 },
-      { N: 17 },
-    ],
+    sdgs: { L: [1,2,3,4,5,6,8,10,12,13,15,16,17]}
   },
 ];
 

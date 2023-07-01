@@ -17,12 +17,6 @@ export class ApiStatefulStack extends Stack {
       tableName: this.coreTable.tableName,
       tableArn: this.coreTable.tableArn,
     });
-
-    new CfnOutput(this, "DynamoCoreTable", {
-      value: this.coreTable.tableName,
-      description: "Core Table",
-      exportName: "DynamoCoreTable"
-    });
   }
   
 }
