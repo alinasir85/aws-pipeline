@@ -2,6 +2,10 @@ import { Stack, StackProps }from "aws-cdk-lib";
 import { ShellStep, CodePipeline, CodePipelineSource, ManualApprovalStep } from "aws-cdk-lib/pipelines";
 import { Construct } from "constructs";
 import { ApiPipelineStage } from "./stage";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { LoggingLevel, SlackChannelConfiguration } from "aws-cdk-lib/aws-chatbot";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { NotificationRule } from "aws-cdk-lib/aws-codestarnotifications";
 
 export class ApiPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -17,16 +21,37 @@ export class ApiPipelineStack extends Stack {
       })
     });
 
+
+    // Add the AWS Slack channel to pipeline to send notifications
+    const topic = new Topic(this, "SlackAlertsTopic", {
+      topicName: "SlackAlertsTopic",
+    });
+    const chatbot = new SlackChannelConfiguration(this, "SlackChatbot", {
+      slackChannelConfigurationName: "SlackChatbotConfig",
+      slackWorkspaceId: "T02R4KYSEGL",
+      slackChannelId: "D05F63LU3U2",
+      notificationTopics: [topic],
+      loggingLevel: LoggingLevel.INFO,
+      logRetention: RetentionDays.ONE_DAY
+    });
+    const chatbotRules = new NotificationRule(this, "SlackNotifications", {
+      source: pipeline.pipeline,
+      events: ["codepipeline-pipeline-pipeline-execution-failed", "codepipeline-pipeline-pipeline-execution-succeeded", "codepipeline-pipeline-manual-approval-needed"]
+    });
+
+
     // Designate Development Stage
     pipeline.addStage(new ApiPipelineStage(this, "development", {
-      env: { account: "417916115807", region: "us-east-1" }
+      env: { account: "417916115807", region: "us-east-1" },
+      chatbotArn: chatbot.slackChannelConfigurationArn
     }));
 
         
     // Designate Production Stage
     // and create Manager Approval step
     pipeline.addStage(new ApiPipelineStage(this, "production", {
-      env: { account: "417916115807", region: "us-east-1" }
+      env: { account: "417916115807", region: "us-east-1" },
+      chatbotArn: chatbot.slackChannelConfigurationArn
     }), {
       pre: [ new ManualApprovalStep("PromoteToProduction")]
     });

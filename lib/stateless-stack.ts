@@ -16,6 +16,7 @@ import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 interface StatelessStackProps extends StackProps {
   table: Table;
   stageName: string;
+  chatbotArn: string;
 }
 
 export class ApiStatelessStack extends Stack {
