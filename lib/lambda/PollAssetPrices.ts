@@ -53,6 +53,7 @@ export async function handler() {
     const subgraphPairs = await axios.post(KLIMA_PAIRS_SUBGRAPH_URL, {
       query: "query {\npairs {\ncurrentprice\nid\n}\n}"
     });
+    const pairs = subgraphPairs.data.data.pairs.filter(({ id }: SubgraphPair) => KLIMA_PAIR_IDS[id]);
         
     // Retrieve supply from Klima Subgraph
     const subgraphMetrics = await axios.post(KLIMA_POLY_SUBGRAPH_URL, {
@@ -61,11 +62,12 @@ export async function handler() {
     const carbonMetrics: {[key: string]: string} = subgraphMetrics.data.data.carbonMetrics[0];
         
     // Map prices and supply to Asset Prices
-    const putRequest: AssetPriceWriteRequest = subgraphPairs.data.data.pairs.reduce((acc: AssetPriceWriteRequest, { id, currentprice }: SubgraphPair) => {
+    const putRequest: AssetPriceWriteRequest = pairs.reduce((acc: AssetPriceWriteRequest, { id, currentprice }: SubgraphPair) => {
       const ticker = KLIMA_PAIR_IDS[id] as Ticker;
+      if (!ticker) return acc;
       const supply = +carbonMetrics[ticker.toLowerCase() + "Supply"];
       const price = +currentprice;
-      if (ticker && supply && price) {
+      if (supply && price) {
         acc.push({
           PutRequest: {
             Item: {
