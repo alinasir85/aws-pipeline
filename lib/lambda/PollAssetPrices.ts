@@ -90,7 +90,7 @@ export async function handler() {
     // Write prices to DynamoDB
     const putResponse = await dbDoc.batchWrite({
       RequestItems: {
-        "CoreTable": putRequest
+        [process.env.TABLE_NAME as string]: putRequest
       },
     });
 
