@@ -12,14 +12,14 @@ interface NodeLambdaProps {
 }
 
 export class NodeLambda extends NodejsFunction {
-    constructor(scope: Construct, id: string, props: NodeLambdaProps) {
-        super(scope, id, {
-            memorySize: 1024,
-            runtime: Runtime.NODEJS_18_X,
-            handler: "handler",
-            entry: props.entry,
-            bundling: { minify: true, externalModules: props.externalModules ?? [] },
-            environment: props.environment
-        });
-    }
+  constructor(scope: Construct, id: string, props: NodeLambdaProps) {
+    super(scope, id, {
+      memorySize: 1024,
+      runtime: Runtime.NODEJS_18_X,
+      handler: "handler",
+      entry: props.entry,
+      bundling: { minify: true, externalModules: props.externalModules ?? [] },
+      environment: props.environment
+    });
+  }
 }
