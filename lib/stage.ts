@@ -8,10 +8,10 @@ interface ApiPipelineStageProps extends StageProps {
 }
 
 export class ApiPipelineStage extends Stage {
-  constructor(scope: Construct, stageName: string, props: ApiPipelineStageProps) {
+  constructor(scope: Construct, stageName: string, props: StageProps) {
     super(scope, stageName, props);
 
     const stateful = new ApiStatefulStack(this, "StatefulStack", stageName);
-    const stateless = new ApiStatelessStack(this, "StatelessStack", {stageName, table: stateful.coreTable, chatbotArn: props.chatbotArn});
+    const stateless = new ApiStatelessStack(this, "StatelessStack", {stageName, table: stateful.coreTable});
   }
 }

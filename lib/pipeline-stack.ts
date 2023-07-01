@@ -5,7 +5,7 @@ import { ApiPipelineStage } from "./stage";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { LoggingLevel, SlackChannelConfiguration } from "aws-cdk-lib/aws-chatbot";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { NotificationRule } from "aws-cdk-lib/aws-codestarnotifications";
+import { DetailType, NotificationRule } from "aws-cdk-lib/aws-codestarnotifications";
 
 export class ApiPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -22,6 +22,25 @@ export class ApiPipelineStack extends Stack {
     });
 
 
+    
+    
+    // Designate Development Stage
+    pipeline.addStage(new ApiPipelineStage(this, "development", {
+      env: { account: "417916115807", region: "us-east-1" },
+    }));
+    
+    
+    // Designate Production Stage
+    // and create Manager Approval step
+    pipeline.addStage(new ApiPipelineStage(this, "production", {
+      env: { account: "417916115807", region: "us-east-1" },
+    }), {
+      pre: [ new ManualApprovalStep("PromoteToProduction")]
+    });
+
+    // Build the pipeline
+    pipeline.buildPipeline();
+    
     // Add the AWS Slack channel to pipeline to send notifications
     const topic = new Topic(this, "SlackAlertsTopic", {
       topicName: "SlackAlertsTopic",
@@ -35,26 +54,10 @@ export class ApiPipelineStack extends Stack {
       logRetention: RetentionDays.ONE_DAY
     });
     const chatbotRules = new NotificationRule(this, "SlackNotifications", {
+      detailType: DetailType.BASIC,
       source: pipeline.pipeline,
-      events: ["codepipeline-pipeline-pipeline-execution-failed", "codepipeline-pipeline-pipeline-execution-succeeded", "codepipeline-pipeline-manual-approval-needed"]
+      events: ["codepipeline-pipeline-pipeline-execution-failed", "codepipeline-pipeline-pipeline-execution-succeeded", "codepipeline-pipeline-manual-approval-needed"],
+      targets: [chatbot]
     });
-
-
-    // Designate Development Stage
-    pipeline.addStage(new ApiPipelineStage(this, "development", {
-      env: { account: "417916115807", region: "us-east-1" },
-      chatbotArn: chatbot.slackChannelConfigurationArn
-    }));
-
-        
-    // Designate Production Stage
-    // and create Manager Approval step
-    pipeline.addStage(new ApiPipelineStage(this, "production", {
-      env: { account: "417916115807", region: "us-east-1" },
-      chatbotArn: chatbot.slackChannelConfigurationArn
-    }), {
-      pre: [ new ManualApprovalStep("PromoteToProduction")]
-    });
-
   }
 }
