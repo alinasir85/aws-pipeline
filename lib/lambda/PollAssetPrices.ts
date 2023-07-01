@@ -84,6 +84,9 @@ export async function handler() {
       return acc;
     }, []);
 
+    console.log("---- PUT REQUEST ----");
+    console.log(putRequest);
+
     // Write prices to DynamoDB
     const putResponse = await dbDoc.batchWrite({
       RequestItems: {

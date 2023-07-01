@@ -12,6 +12,7 @@ import { NodeLambda } from "./constructs/stateless/NodeLambda";
 import * as path from "path";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 
 interface StatelessStackProps extends StackProps {
   table: Table;
@@ -64,6 +65,11 @@ export class ApiStatelessStack extends Stack {
       entry: path.join(__dirname, "lambda/PollAssetPrices.ts"),
       environment: { TABLE_NAME: table.tableName },
     });
+    pollAssetPricesLambda.addToRolePolicy(new PolicyStatement({
+      actions: ["dynamodb:BatchWriteItem"],
+      effect: Effect.ALLOW,
+      resources: [table.tableArn],
+    }));
 
     /**
      * * GRANTS
