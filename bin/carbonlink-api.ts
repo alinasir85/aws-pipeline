@@ -4,7 +4,7 @@ import { App } from "aws-cdk-lib";
 import { ApiPipelineStack } from "../lib/pipeline-stack";
 
 const app = new App();
-new ApiPipelineStack(app, "EvansTestApiStack", {
+new ApiPipelineStack(app, "PipelineTest", {
   env: { account: "417916115807", region: "us-east-1" },
 });
 
