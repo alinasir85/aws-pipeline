@@ -1,22 +1,36 @@
 import { CfnOutput, Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { OneTable } from "./constructs/stateful/OneTable";
-import { Table } from "aws-cdk-lib/aws-dynamodb";
-import { SeedResource } from "./constructs/stateful/SeedResource";
+import {ApiPipelineStack} from "./pipeline-stack";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {LoggingLevel, SlackChannelConfiguration} from "aws-cdk-lib/aws-chatbot";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
 
 export class ApiStatefulStack extends Stack {
-  public readonly coreTable: Table;
-  constructor(scope: Construct, id: string, stageName: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
-        
-    // Implementing single-table design with a Core Table
-    this.coreTable = new OneTable(this, "CoreTable").table;
+/*    const topic = new Topic(this, `ChatbotTopic`, {
+      topicName: `SlackTopic`,
+    });
+    const chatbot = new SlackChannelConfiguration(this, `SlackChatbot`, {
+      slackChannelConfigurationName: `SlackChannelConfigs`,
+      slackWorkspaceId: "T05MG082E3W",
+      slackChannelId: "C05MAK4R353",
+      notificationTopics: [topic],
+      loggingLevel: LoggingLevel.INFO,
+      logRetention: RetentionDays.ONE_DAY
+    });*/
 
-    // Seeding Core Table
-    // new SeedResource(this, "SeedResource", {
-    //   tableName: this.coreTable.tableName,
-    //   tableArn: this.coreTable.tableArn,
-    // });
+    const devPipeline = new ApiPipelineStack(scope, "devPipeline", {
+      env: { account: "417916115807", region: "us-east-1" },
+      branchName: 'develop',
+      stage: 'dev'
+    });
+
+    const prodPipeline = new ApiPipelineStack(scope, "prodPipeline", {
+      env: { account: "417916115807", region: "us-east-1" },
+      branchName: 'main',
+      stage: 'prod'
+    });
   }
   
 }

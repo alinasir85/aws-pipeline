@@ -2,10 +2,10 @@
 import "source-map-support/register";
 import { App } from "aws-cdk-lib";
 import { ApiPipelineStack } from "../lib/pipeline-stack";
+import {ApiStatefulStack} from "../lib/stateful-stack";
 
 const app = new App();
-new ApiPipelineStack(app, "PipelineTest", {
-  env: { account: "417916115807", region: "us-east-1" },
-});
+
+new ApiStatefulStack(app,"StateFullStack")
 
 app.synth();
