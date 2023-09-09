@@ -39,7 +39,7 @@ export class ApiPipelineStack extends Stack {
       topicName: "SlackAlertsTopic",
     });
     const chatbot = new SlackChannelConfiguration(this, "SlackChatbot", {
-      slackChannelConfigurationName: "SlackChatbotConfig",
+      slackChannelConfigurationName: "SlackChatbotConfigs",
       slackWorkspaceId: "T05MG082E3W",
       slackChannelId: "C05MAK4R353",
       notificationTopics: [topic],
