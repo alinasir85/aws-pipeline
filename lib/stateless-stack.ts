@@ -15,6 +15,7 @@ export class ApiStatelessStack extends Stack {
     const { stageName } = props;
 
     const envFilePath = `./.env.${stageName}`;
+    console.log("envFilePath: ",envFilePath)
     if (fs.existsSync(envFilePath)) {
       require('dotenv').config({ path: envFilePath });
     } else {
