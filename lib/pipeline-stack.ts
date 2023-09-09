@@ -40,8 +40,8 @@ export class ApiPipelineStack extends Stack {
     });
     const chatbot = new SlackChannelConfiguration(this, "SlackChatbot", {
       slackChannelConfigurationName: "SlackChatbotConfig",
-      slackWorkspaceId: "T02R4KYSEGL",
-      slackChannelId: "C05S0KBDYV7",
+      slackWorkspaceId: "T05MG082E3W",
+      slackChannelId: "C05MAK4R353",
       notificationTopics: [topic],
       loggingLevel: LoggingLevel.INFO,
       logRetention: RetentionDays.ONE_DAY
