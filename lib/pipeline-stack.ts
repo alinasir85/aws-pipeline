@@ -2,6 +2,10 @@ import {Stack, StackProps} from "aws-cdk-lib";
 import {CodePipeline, CodePipelineSource, ManualApprovalStep, ShellStep} from "aws-cdk-lib/pipelines";
 import {Construct} from "constructs";
 import {ApiPipelineStage} from "./stage";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {LoggingLevel, SlackChannelConfiguration} from "aws-cdk-lib/aws-chatbot";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {DetailType, NotificationRule} from "aws-cdk-lib/aws-codestarnotifications";
 
 export class ApiPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -30,8 +34,6 @@ export class ApiPipelineStack extends Stack {
     pipeline.buildPipeline();
 
 
-
-/*
     // Add the AWS Slack channel to pipeline to send notifications
     const topic = new Topic(this, "SlackAlertsTopic", {
       topicName: "SlackAlertsTopic",
@@ -39,7 +41,7 @@ export class ApiPipelineStack extends Stack {
     const chatbot = new SlackChannelConfiguration(this, "SlackChatbot", {
       slackChannelConfigurationName: "SlackChatbotConfig",
       slackWorkspaceId: "T02R4KYSEGL",
-      slackChannelId: "C05ERJ9H04F",
+      slackChannelId: "C05S0KBDYV7",
       notificationTopics: [topic],
       loggingLevel: LoggingLevel.INFO,
       logRetention: RetentionDays.ONE_DAY
@@ -49,6 +51,6 @@ export class ApiPipelineStack extends Stack {
       source: pipeline.pipeline,
       events: ["codepipeline-pipeline-pipeline-execution-failed", "codepipeline-pipeline-pipeline-execution-succeeded", "codepipeline-pipeline-manual-approval-needed"],
       targets: [chatbot]
-    });*/
+    });
   }
 }
