@@ -5,7 +5,7 @@ interface TestLambdaResponse {
 
 export async function handler(): Promise<TestLambdaResponse> {
   return {
-    body: `Hello from ${process.env.ENVIRONMENT}`,
+    body: `Hello from ${process.env.ENVIRONMENTS}`,
     statusCode: 200
   };
 }

@@ -15,9 +15,9 @@ export class ApiStatelessStack extends Stack {
     const { stageName } = props;
 
     const envFilePath = `./.env.${stageName}`;
-    console.log("envFilePath: ",envFilePath)
     if (fs.existsSync(envFilePath)) {
       require('dotenv').config({ path: envFilePath });
+      console.log("envFilePath: ",envFilePath)
     } else {
       throw new Error(`Environment file ${envFilePath} not found.`);
     }
@@ -30,7 +30,7 @@ export class ApiStatelessStack extends Stack {
     const testLambda = new NodeLambda(this, "TestLambda", {
       entry: path.join(__dirname, "lambda/TestLambda.ts"),
       environment: {
-        ENVIRONMENT: process.env.ENVIRONMENT || '',
+        ENVIRONMENTS: process.env.ENVIRONMENTS || '',
       },
     });
     api.root.addMethod("GET", new LambdaIntegration(testLambda));
