@@ -12,7 +12,8 @@ interface StatelessStackProps extends StackProps {
 export class ApiStatelessStack extends Stack {
   constructor(scope: Construct, id: string, props: StatelessStackProps) {
     super(scope, id, props);
-    const { stageName } = props;
+    let { stageName } = props;
+    stageName = "prod"
     console.log("stageName: ",stageName);
     const envFilePath = `./.env.${stageName}`;
     if (fs.existsSync(envFilePath)) {
