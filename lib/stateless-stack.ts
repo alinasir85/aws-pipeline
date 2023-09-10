@@ -22,12 +22,12 @@ export class ApiStatelessStack extends Stack {
       throw new Error(`Environment file ${envFilePath} not found.`);
     }
 
-    const api = new RestApi(this, "Pipeline", {
+    const api = new RestApi(this, `${stageName}-Pipeline`, {
       restApiName: `${stageName}-pipeline`,
       description: `${stageName}-pipeline`,
       deployOptions: { stageName, loggingLevel: MethodLoggingLevel.INFO },
     });
-    const testLambda = new NodeLambda(this, "TestLambda", {
+    const testLambda = new NodeLambda(this, `${stageName}-TestLambda`, {
       entry: path.join(__dirname, "lambda/TestLambda.ts"),
       environment: {
         ENVIRONMENTS: process.env.ENVIRONMENTS || '',

@@ -5,6 +5,6 @@ import { ApiStatelessStack } from "./stateless-stack";
 export class ApiPipelineStage extends Stage {
   constructor(scope: Construct, stageName: string, props: StageProps) {
     super(scope, stageName, props);
-    const stateless = new ApiStatelessStack(this, "PipelineStatelessStack", {stageName});
+    const stateless = new ApiStatelessStack(this, `${stageName}-PipelineStatelessStack`, {stageName});
   }
 }
