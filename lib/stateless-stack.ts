@@ -13,7 +13,6 @@ export class ApiStatelessStack extends Stack {
   constructor(scope: Construct, id: string, props: StatelessStackProps) {
     super(scope, id, props);
     let { stageName } = props;
-    stageName = "prod"
     console.log("stageName: ",stageName);
     const envFilePath = `./.env.${stageName}`;
     if (fs.existsSync(envFilePath)) {
@@ -36,10 +35,10 @@ export class ApiStatelessStack extends Stack {
     });
     api.root.addMethod("GET", new LambdaIntegration(testLambda));
 
-    const devStage = new Stage(this, 'DevStage', {
+    const devStage = new Stage(this, `${stageName}-devStage`, {
       stageName
     });
-    const prodStage = new Stage(this, 'ProdStage', {
+    const prodStage = new Stage(this, `${stageName}-prodStage`, {
       stageName
     });
 
