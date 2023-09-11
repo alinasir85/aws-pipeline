@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Check Develop Branch
         run: |
-          if git diff --name-only main..develop | grep -q .; then
+          if [[ $(git diff --name-only main..develop) ]]; then
             echo "Changes found in the develop branch."
             exit 0
           else
