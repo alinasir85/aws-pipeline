@@ -1,0 +1,21 @@
+name: Check Develop Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-develop-branch:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check Develop Branch
+        run: |
+          if git diff --name-only main..develop | grep -q .; then
+            echo "Changes found in the develop branch."
+            exit 0
+          else
+            echo "No changes found in the develop branch. Cannot merge to main."
+            exit 1
+          fi
