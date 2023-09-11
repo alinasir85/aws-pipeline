@@ -1,9 +1,9 @@
-import {Stack, StackProps} from "aws-cdk-lib";
+import {Fn, Stack, StackProps} from "aws-cdk-lib";
 import {CodePipeline, CodePipelineSource, ManualApprovalStep, ShellStep} from "aws-cdk-lib/pipelines";
 import {Construct} from "constructs";
 import {ApiPipelineStage} from "./stage";
 import {DetailType, NotificationRule} from "aws-cdk-lib/aws-codestarnotifications";
-
+import {SlackChannelConfiguration} from "aws-cdk-lib/aws-chatbot";
 interface ExtendedStackProps extends StackProps {
     branchName: string;
     stage: string;
@@ -18,7 +18,15 @@ export class ApiPipelineStack extends Stack {
                 input: CodePipelineSource.connection("alinasir85/aws-pipeline", props.branchName, {
                     connectionArn: "arn:aws:codestar-connections:us-east-1:417916115807:connection/79e35c0d-3af7-4c34-8d97-360384ddf94a"
                 }),
-                commands: ["npm ci", "npm run build", "npx cdk synth"]
+                commands: [
+                    'npm ci',
+                    'npm run build',
+                    'npx cdk synth',
+                ],
+                env: {
+                    account: "417916115807",
+                    region: "us-east-1",
+                },
             })
         });
         if (props.stage === 'dev') {
@@ -34,11 +42,18 @@ export class ApiPipelineStack extends Stack {
         }
         pipeline.buildPipeline();
 
-/*        const chatbotRules = new NotificationRule(this, `${props.stage}-SlackNotifications`, {
+        const chatbotArn = Fn.importValue("ChatbotArnExportName");
+        console.log("chatbotArn: ",chatbotArn)
+        const chatbot = SlackChannelConfiguration.fromSlackChannelConfigurationArn(
+            this,
+            "ImportedChatbot",
+            chatbotArn
+        );
+        const chatbotRules = new NotificationRule(this, `${props.stage}-SlackNotifications`, {
             detailType: DetailType.BASIC,
             source: pipeline.pipeline,
             events: ["codepipeline-pipeline-pipeline-execution-failed", "codepipeline-pipeline-pipeline-execution-succeeded", "codepipeline-pipeline-manual-approval-needed"],
-            targets: [props.chatbot]
-        });*/
+            targets: [chatbot]
+        });
     }
 }

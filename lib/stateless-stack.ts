@@ -1,9 +1,10 @@
-import {Stack, StackProps, Stage} from "aws-cdk-lib";
-import {LambdaIntegration, MethodLoggingLevel, RestApi,} from "aws-cdk-lib/aws-apigateway";
+import {Stack, StackProps} from "aws-cdk-lib";
+import {Deployment, LambdaIntegration, MethodLoggingLevel, RestApi, Stage,} from "aws-cdk-lib/aws-apigateway";
 import {Construct} from "constructs";
 import {NodeLambda} from "./constructs/stateless/NodeLambda";
 import * as path from "path";
 import * as fs from "fs";
+import * as dotenv from 'dotenv';
 
 interface StatelessStackProps extends StackProps {
   stageName: string;
@@ -16,12 +17,12 @@ export class ApiStatelessStack extends Stack {
     console.log("stageName:  ",stageName);
     const envFilePath = `./.env.${stageName}`;
     if (fs.existsSync(envFilePath)) {
-      require('dotenv').config({ path: envFilePath });
+      dotenv.config({ path: envFilePath, override: true });
       console.log("envFilePath: ",envFilePath)
     } else {
       throw new Error(`Environment file ${envFilePath} not found.`);
     }
-
+    console.log("process.env.ENVIRONMENTS: ",process.env.ENVIRONMENTS)
     const api = new RestApi(this, `${stageName}-Pipeline`, {
       restApiName: `${stageName}-pipeline`,
       description: `${stageName}-pipeline`,
@@ -34,13 +35,5 @@ export class ApiStatelessStack extends Stack {
       },
     });
     api.root.addMethod("GET", new LambdaIntegration(testLambda));
-
-    const devStage = new Stage(this, `${stageName}-devStage`, {
-      stageName
-    });
-    const prodStage = new Stage(this, `${stageName}-prodStage`, {
-      stageName
-    });
-
   }
 }
